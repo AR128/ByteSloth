@@ -11,12 +11,13 @@ const handler: Handler = async (event: HandlerEvent) => {
     };
   }
 
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  // Use process.env to access environment variables in a Node.js environment
+  const apiKey = process.env.API_KEY;
 
   if (!apiKey) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "API_KEY environment variable not set." }),
+      body: JSON.stringify({ error: "API_KEY environment variable not set on the server." }),
     };
   }
   
