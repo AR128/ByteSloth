@@ -4,7 +4,6 @@ import { LanguageSelector } from './components/LanguageSelector';
 import { CodeInput } from './components/CodeInput';
 import { ReviewOutput } from './components/ReviewOutput';
 import { LANGUAGES, INITIAL_CODE } from './constants';
-import { reviewCode } from './services/geminiService';
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<string>(LANGUAGES[0].value);
@@ -17,7 +16,6 @@ const App: React.FC = () => {
   const isInitialMount = useRef(true);
 
   const handleSubmitReview = useCallback(async () => {
-    // Clear any existing debounce timer when a review is triggered.
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
     }
@@ -31,8 +29,19 @@ const App: React.FC = () => {
     setReview('');
 
     try {
-      const result = await reviewCode(code, language);
-      setReview(result);
+      const response = await fetch('/.netlify/functions/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, language }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred during fetch.' }));
+        throw new Error(errorData.error || `Request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      setReview(data.review);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
       setError(`Failed to get review: ${errorMessage}`);
@@ -43,7 +52,6 @@ const App: React.FC = () => {
   }, [code, language]);
 
   const handleClearCode = useCallback(() => {
-    // Clear any existing debounce timer.
     if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
     }
@@ -53,28 +61,23 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Prevent auto-review on the initial component mount.
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
 
-    // Clear the previous timeout on every code or language change.
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
     }
 
-    // Don't trigger for empty code.
     if (!code.trim()) {
         return;
     }
 
-    // Set a new timeout to trigger the review after a delay.
     debounceTimeout.current = window.setTimeout(() => {
       handleSubmitReview();
-    }, 1500); // 1.5-second debounce delay
+    }, 1500);
 
-    // Cleanup: clear the timeout if the component unmounts.
     return () => {
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
@@ -100,7 +103,8 @@ const App: React.FC = () => {
             </label>
             <CodeInput
               value={code}
-              onChange={(e) => setCode(e.target.value)}
+              onValueChange={setCode}
+              language={language}
             />
           </div>
           <div className="flex items-center space-x-4">

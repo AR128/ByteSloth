@@ -14,10 +14,13 @@ interface ReviewOutputProps {
 }
 
 const Placeholder: React.FC = () => (
-    <div className="flex items-center justify-center h-full text-center text-gray-500">
+    <div className="flex items-center justify-center h-full text-center text-gray-500 p-4">
         <div>
-            <h3 className="text-lg font-semibold">Ready to Review</h3>
+            <h3 className="text-lg font-semibold text-gray-400">Ready to Review</h3>
             <p>Your code review feedback will appear here once you submit your code.</p>
+            <p className="text-xs text-gray-600 mt-4 italic">
+                Note for developers: For this application to function after deployment, ensure the Gemini <code>API_KEY</code> is set in your hosting environment variables. See README.md for details.
+            </p>
         </div>
     </div>
 );
