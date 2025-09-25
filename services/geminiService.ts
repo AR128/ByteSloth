@@ -1,11 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 // Ensure the API key is available. In a real app, this should be handled more securely.
-if (!process.env.API_KEY) {
-  console.warn("API_KEY environment variable not set. Using a placeholder. The app may not function correctly.");
+if (!apiKey) {
+  throw new Error("VITE_GEMINI_API_KEY is not set in the environment.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+const ai = new GoogleGenAI({ apiKey });
 
 export async function reviewCode(code: string, language: string): Promise<string> {
 
