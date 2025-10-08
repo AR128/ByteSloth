@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Header } from './components/Header';
 import { LanguageSelector } from './components/LanguageSelector';
 import { CodeInput } from './components/CodeInput';
@@ -13,15 +13,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const debounceTimeout = useRef<number | null>(null);
-  const isInitialMount = useRef(true);
-
   const handleSubmitReview = useCallback(async () => {
-    // Clear any existing debounce timer when a review is triggered.
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-
     if (!code.trim()) {
       setError('Please enter some code to review.');
       return;
@@ -43,45 +35,10 @@ const App: React.FC = () => {
   }, [code, language]);
 
   const handleClearCode = useCallback(() => {
-    // Clear any existing debounce timer.
-    if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-    }
     setCode('');
     setReview('');
     setError(null);
   }, []);
-
-  useEffect(() => {
-    // Prevent auto-review on the initial component mount.
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
-    // Clear the previous timeout on every code or language change.
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-
-    // Don't trigger for empty code.
-    if (!code.trim()) {
-        return;
-    }
-
-    // Set a new timeout to trigger the review after a delay.
-    debounceTimeout.current = window.setTimeout(() => {
-      handleSubmitReview();
-    }, 1500); // 1.5-second debounce delay
-
-    // Cleanup: clear the timeout if the component unmounts.
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [code, language, handleSubmitReview]);
-
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-screen bg-gray-900 text-white font-sans">
