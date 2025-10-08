@@ -13,6 +13,7 @@ export const LANGUAGES: Language[] = [
   { name: 'HTML', value: 'html' },
   { name: 'CSS', value: 'css' },
   { name: 'SQL', value: 'sql' },
+  { name: 'C', value: 'c' },
   { name: 'C++', value: 'cpp' },
   { name: 'C#', value: 'csharp' },
 ];
