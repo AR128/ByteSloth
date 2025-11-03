@@ -16,6 +16,9 @@ export const LANGUAGES: Language[] = [
   { name: 'C', value: 'c' },
   { name: 'C++', value: 'cpp' },
   { name: 'C#', value: 'csharp' },
+  { name: 'Kotlin', value: 'kotlin' },
+  { name: 'Jetpack Compose', value: 'jetpack-compose' },
+  { name: 'Flutter', value: 'flutter' },
 ];
 
 export const INITIAL_CODE = `function bubbleSort(arr) {
